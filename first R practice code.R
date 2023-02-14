@@ -80,3 +80,4 @@ subset(df,name=="Jordan") #easier way to subset
 
 install.packages("ggplot2")
 
+
