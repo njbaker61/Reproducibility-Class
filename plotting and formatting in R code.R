@@ -79,3 +79,69 @@ ggplot(bull.richness.soy.no.till, aes(x=GrowthStage,y=richness,color=Fungicide))
   geom_boxplot() +
   geom_point(position = position_jitterdodge(dodge.width=0.9))
 
+
+
+
+### Next lesson 2/21/23
+
+##Bar charts
+
+ggplot(bull.richness.soy.no.till, aes(x=GrowthStage,y=richness,color=Fungicide))+
+  stat_summary(fun=mean,geom="bar")+
+  stat_summary(fun.data=mean_se,geom="errorbar")
+
+##adjust position, dodge bars
+
+ggplot(bull.richness.soy.no.till, aes(x=GrowthStage,y=richness,color=Fungicide))+
+  stat_summary(fun=mean,geom="bar",position="dodge")+
+  stat_summary(fun.data=mean_se,geom="errorbar",position="dodge")
+
+##change bar color, add points with outlines - need color and fill
+
+ggplot(bull.richness.soy.no.till, aes(x=GrowthStage,y=richness,fill=Fungicide))+
+  stat_summary(fun=mean,geom="bar",position="dodge")+
+  stat_summary(fun.data=mean_se,geom="errorbar",position="dodge")+
+  geom_point(position=position_jitterdodge(dodge.width=0.9),shape=21,color="Black")+
+  scale_color_manual(values=c("blue","green"))+
+  scale_fill_manual(values=c("blue","green"))
+
+
+##represent data over time:
+
+ggplot(bull.richness.soy.no.till, aes(x=GrowthStage,y=richness,group=Fungicide,color=Fungicide))+
+  stat_summary(fun=mean,geom="line")+
+  stat_summary(fun=mean,geom="point")+
+  stat_summary(fun.data=mean_se,geom="errorbar")+
+  ylab("richness \n of fungi")
+
+### \n is like hitting the enter button, allows to deterimne where to split titles/labels
+
+
+
+##Faceting- can apply code above used on subsetted data to whole data set 
+
+ggplot(BullRichness, aes(x=GrowthStage,y=richness,group=Fungicide,color=Fungicide))+
+  stat_summary(fun=mean,geom="line")+
+  stat_summary(fun=mean,geom="point")+
+  stat_summary(fun.data=mean_se,geom="errorbar")+
+  ylab("richness \n of fungi")+
+  facet_wrap(~Treatment*Crop,scales="free") 
+## the * allows you to block by specific interactions. can be in any order.
+# scales="free" allows each plot to be formatted and scaled properly
+
+
+#theme
+
+ggplot(BullRichness, aes(x=GrowthStage,y=richness,group=Fungicide,color=Fungicide))+
+  stat_summary(fun=mean,geom="line")+
+  stat_summary(fun=mean,geom="point")+
+  stat_summary(fun.data=mean_se,geom="errorbar")+
+  ylab("richness \n of fungi")+
+  facet_wrap(~Treatment*Crop,scales="free")+
+  theme_dark()+ ##can be anything, i just wanted to try dark
+  scale_color_manual(values=c("pink","purple"))+ #can be any colors
+  geom_jitter() #didnt see the rest of the code.
+
+
+
+
