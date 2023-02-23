@@ -3,17 +3,55 @@ title: "RMarkdownIntro"
 author: "Nicole Baker"
 date: "2023-02-23"
 output:
-  word_document: default
   github_document: default
+  word_document: default
 ---
 
 
 we will create R markdown basics! learn syntax, where to write code, how to embed pictures.
+
+# This is a first level Header in Markdown
+
+## This is a second level header in markdown
+
+### this is a third level header in markdown
+
+fourth level also exists as well.
+
+*asterisks make text appear in italics*
+
+_Italics also works with underscores_
+
+**two asterisks makes text bold**
+
+> This is emphasized text
 
 first chunk:
 
 ```{r}
 data("mtcars")
 summary(mtcars)
+#you can still have comments in your code
 ```
+
+### Unordered Lists
+
+- one item
+- second item
+- third item
+  - indented item with the tab key
+
+
+1. the first item 
+2. the second item
+    - subcategory under 2 done with tab key hit twice
+3. the third item
+
+### Hyperlinks
+
+[this is a hyperlink to my repository](https://github.com/njbaker61/Reproducibility-Class)
+
+
+
+
 
