@@ -52,6 +52,20 @@ summary(mtcars)
 [this is a hyperlink to my repository](https://github.com/njbaker61/Reproducibility-Class)
 
 
+## to add an image:
+![The Moon-image caption goes here](Moon.jpg)
+-to move back in directory: (../folder/jpg)
+-to move forward in directory: (folder/jpg)
 
+
+## editing readme files:
+same process in github as for images above, with brackets and parenthesis.
+
+## formatting tables: with kable function
+```{r}
+data(mtcars)
+library(knitr)
+kable(head(mtcars))
+```
 
 
