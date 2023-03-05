@@ -1,3 +1,18 @@
+## Vectors, Matrices, and Dataframes
+
+#vector example:
+vec<-c(1:100)
+vec
+
+#matrix example:
+Matrix<-matrix(data=c("Nicole","Jordan","Kayla"),nrow=3,ncol=4)
+Matrix
+
+#dataframe example:
+df<-data.frame(vec[1:3],Matrix[,2])
+df
+
+
 ##Subsetting ToothGrowth
 ToothGrowth
 subset(ToothGrowth,supp=="VC")
