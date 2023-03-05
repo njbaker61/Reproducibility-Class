@@ -28,8 +28,8 @@ ggplot(TrapData, aes(x=Species,y=Collected,color=Location,fill=Location))+
   ylab("Number Collected")+
   xlab("Chrysobothris Species")+
   scale_fill_manual(values=c("pink","blue","purple"))+
-  theme_classic()
-#theme_classic() is an example of a theme
+  theme_classic(base_size = 15)
+#theme_classic() is an example of a theme. the base size is just to adjust the text so it is easier to read.
 
 ##example of facets
 
@@ -38,7 +38,16 @@ ggplot(TrapData, aes(x=Species,y=Collected,color=Location,fill=Location))+
   ylab("Number Collected")+
   xlab("Chrysobothris Species")+
   scale_fill_manual(values=c("pink","blue","purple"))+
-  theme_classic()+
+  theme_classic(base_size = 15)+
   facet_wrap(~Species*Location,scales="free")
-#facet_wrap is how to split data into subsets.  
+#facet_wrap is how to split data into subsets. 
 
+##Extra: italicizing x axis title
+
+ggplot(TrapData, aes(x=Species,y=Collected,fill=Location))+
+  stat_summary(fun=mean,geom="bar",position="dodge",color="black")+
+  labs(y="Number Collected",
+       x=expression(~italic(Chrysobothris)~ 'Species'))+
+  scale_fill_manual(values=c("pink","blue","purple"))+
+  theme_classic(base_size = 15)
+#I just wanted to see if I could make the genus italic.
