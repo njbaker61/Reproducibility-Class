@@ -1,0 +1,161 @@
+---
+title: "Exam Question 6"
+author: "Nicole Baker"
+date: "2023-03-05"
+output:
+  github_document: default
+  html_document: default
+  word_document: default
+---
+
+# Question 4: ggplot2 Concepts
+
+```{r}
+##this code is so that the figures display in this markdown file without species names overlapping on the x axis.
+library(knitr)
+knitr::opts_chunk$set(fig.width=12, fig.height=9)
+```
+
+### layering
+#### Layering is how you are able to add iterative detail and complexity to figures in ggplot. Each layer controls a specific aesthetic or data component of the figure, like color of plots, x and y axes titles, where data points sit relative to other chart elements, etc.
+
+- First, I installed and loaded ggplot2.
+
+```{r}
+#install.packages("ggplot2")
+library(ggplot2)
+```
+
+- Next, I loaded in my data. For this question, I chose to use some of my trapping data from the Spring/Summer 2022 season. This data includes 8 wood boring beetle species in the genus *Chrysobothris* collected across 3 locations in Alabama.
+
+  *in order for the data to be used by functions, I made my data an object called "TrapData".*
+
+```{r}
+TrapData<-read.csv("TrapData.csv")
+```
+- Now that I have my data, I can use the ggplot() function and a few layers to make a basic bar graph:
+
+```{r}
+ggplot(TrapData, aes(x=Species,y=Collected,fill=Location))+
+  stat_summary(fun=mean,geom="bar",position="dodge")+
+  ylab("Number Collected")+
+  xlab("Chrysobothris Species")
+```
+
+- The stat_summary, ylab, and xlab lines of code are examples of layers, since they control the bar appearance and position, and the labels of the axes.
+
+### Scales
+#### Scales are ways to map data information as aesthetic information: aspects of figure elements such as color, size, and shape are all things that can be changed manually with scales.
+
+- In order to use a scale function to manually change color, I will add it to my previous ggplot code from the layering example. 
+- Additionally, by adding color="black" to the stat_summary line of code, I am able to outline all bars with black.
+
+```{r}
+ggplot(TrapData, aes(x=Species,y=Collected,fill=Location))+
+  stat_summary(fun=mean,geom="bar",position="dodge",color="black")+
+  ylab("Number Collected")+
+  xlab("Chrysobothris Species")+
+  scale_fill_manual(values=c("pink","blue","purple"))
+```
+
+- The scale_fill_manual() function allowed me to change the colors of the bars to colors of my choice. Specific color numbers from color palettes can be used as well.
+
+### Themes
+#### Themes in ggplot can be used to change the basic layout, font, size of labels and legends, gridlines, and background aspects of a figure. Themes are an easy way to give a figure a consistent, neat appearance.
+
+- To add a theme, I can include it into the code from the previous figures:
+```{r}
+ggplot(TrapData, aes(x=Species,y=Collected,fill=Location))+
+  stat_summary(fun=mean,geom="bar",position="dodge",color="black")+
+  ylab("Number Collected")+
+  xlab("Chrysobothris Species")+
+  scale_fill_manual(values=c("pink","blue","purple"))+
+  theme_classic(base_size = 15)
+```
+
+- By adding theme_classic() to my code, the figure becomes a bit more streamlined, with no gridlines or grey shading behind the bars. Other themes include theme_dark() or theme_bw(). Since the theme controls the font of the figure, I set the base size to 15 so my figure is more readable.
+
+### Facets
+#### Facets split a plot of data into a set or block of figures, which can be compared or inspected individually. This is useful if you want to block by specific variables, or look at various subsets of data. 
+
+- To facet my data, I just need to add the facet_wrap() function to the previously generated code:
+```{r}
+ggplot(TrapData, aes(x=Species,y=Collected,fill=Location))+
+  stat_summary(fun=mean,geom="bar",position="dodge",color="black")+
+  ylab("Number Collected")+
+  xlab("Chrysobothris Species")+
+  scale_fill_manual(values=c("pink","blue","purple"))+
+  theme_classic(base_size = 15)+
+  facet_wrap(~Species*Location,scales = "free")
+```
+
+- By using the asterisk in between the variables I wanted to subset, I was able to block the *Chrysobothris* species by the 3 locations I collected from. The scales="free" argument of the facet code allows for the x and y arguments to exist independently in each facet.
+
+### Extra: Italicizing the x axis title
+- I just wanted to see that I could do it:
+```{r}
+ggplot(TrapData, aes(x=Species,y=Collected,fill=Location))+
+  stat_summary(fun=mean,geom="bar",position="dodge",color="black")+
+  labs(y="Number Collected",
+     x=expression(~italic(Chrysobothris)~ 'Species'))+
+  scale_fill_manual(values=c("pink","blue","purple"))+
+  theme_classic(base_size = 15)
+
+```
+- Now *Chrysobothris* is italicized on the figure!
+
+# Question 5: Vectors, Matrices, and Dataframes: Subsetting
+
+### Vectors
+- A vector is a set of scalar elements, like a list of numbers, that are grouped together in a single object.
+  - Example:
+```{r echo=TRUE}
+vec<-c(1:100)
+vec
+```
+
+### Matrices
+- A matrix is an object that is made up of only one type of data: only numbers, or only character values, but not both. 
+  - Example:
+```{r echo=TRUE}
+Matrix<-matrix(data=c("Nicole","Jordan","Kayla"),nrow=3,ncol=4)
+Matrix
+```
+
+### Dataframes
+- A dataframe is an object that can contain multiple different kinds of data, making them more useful.
+  - Example:
+```{r}
+df<-data.frame(vec[1:3],Matrix[,2])
+df
+```
+
+#### While all three of these are objects, vectors are the simplest. Both matrices and dataframes can have columns and rows, but dataframes can have more than one kind of data, whereas matrices can not. All of these objects can be subsetted and indexed in similar ways. 
+
+### Subsetting A Dataframe
+- First, import the tooth growth data:
+```{r echo=TRUE}
+ToothGrowth
+```
+
+- In order to include rows where supp is equal to VC, you will subset like this:
+```{r echo=TRUE}
+subset(ToothGrowth,supp=="VC")
+```
+this restricts the data set to rows 1-30 only.
+
+- In order to include rows where supp is equal to VC *and* dose is equal to 0.5, you will subset like this:
+```{r echo=TRUE}
+subset(ToothGrowth,supp=="VC" & dose=="0.5")
+```
+this restricts the data to rows 1-10 only. 
+
+- In order to get the values of len where supp is equal to VC and dose is equal to 0.5, you can do this: 
+```{r echo=TRUE}
+ToothGrowth$len[1:10]
+```
+this outputs the values of len for rows 1-10 only, which is where supp=VC and dose=0.5 (as determined above). This is a vector.
+
+
+### This markdown file, as well as the script files for questions 4 and 5, are located in my github repository:
+### https://github.com/njbaker61/Reproducibility-Class
