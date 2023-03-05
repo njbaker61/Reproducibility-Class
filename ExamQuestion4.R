@@ -2,7 +2,7 @@
 install.packages("ggplot2")
 library(ggplot2)
 
-read.csv("TrapData.csv")
+TrapData<-read.csv("TrapData.csv")
 
 ggplot(TrapData, aes(x=Species,y=Collected,color=Location,fill=Location))+
   stat_summary(fun=mean,geom="bar",position="dodge")+
