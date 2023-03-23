@@ -1,0 +1,183 @@
+---
+title: "Data Wrangling Assignment"
+author: "Nicole Baker"
+date: "2023-03-23"
+output: 
+  html_document: default
+  word_document: default
+  github_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Wrangling
+
+```{r}
+#install.packages("tidyverse")
+library(tidyverse)
+```
+
+### I am using the microbiome data:
+```{r}
+microbiome.data<-read.csv("Microbiome.csv")
+microbiome.data
+```
+
+## 1. Selecting specific columns of data
+
+```{r}
+microbiome.subset<-select(microbiome.data,OTU,
+                          SampleID,Abundance,Crop,
+                          Compartment,DateSampled,
+                          GrowthStage,Treatment,Rep,
+                          Fungicide,Kingdom,Phylum,
+                          Class,Order,Family,Genus,
+                          Species,Taxonomy)
+microbiome.subset
+```
+
+## 2. Calculate mean % relative abundance by compartment, using pipe
+
+you need to mutate data by making a percent column (multiply Abundance values by 100). Then a summarise statement to calculate the mean percentage.
+In order to group this by Compartment, you need to add a group_by statement prior to the mutate statement.
+
+```{r}
+microbiome.subset %>%
+  group_by(Compartment) %>%
+  mutate(Percent=Abundance*100) %>%
+  summarise(Mean=mean(Percent)) %>% 
+  
+  head()
+```
+
+now, you are given means for root and leaf compartments.
+
+## 3. Calculate mean % relative abundance by compartment and fungicide, using pipe
+
+one way to do this is by adding both Compartment and Fungicide to the group_by() statement, producing four mean values: 
+
+```{r}
+microbiome.subset %>%
+  group_by(Compartment,Fungicide) %>%
+  mutate(Percent=Abundance*100) %>%
+  summarise(Mean=mean(Percent)) %>% 
+  
+  head()
+```
+ 
+
+another way to do this is by adding Compartment and Fungicide to separate group_by() statements, which produces only two mean values: 
+
+```{r}
+microbiome.subset %>%
+  group_by(Compartment) %>%
+  group_by(Fungicide) %>%
+  mutate(Percent=Abundance*100) %>%
+  summarise(Mean=mean(Percent)) %>% 
+  
+  head()
+```
+
+## 4. restricting previous analysis to just fungal class "Dothideomycetes"
+
+In order to do this, add the filter function underneath the microbiome.subset statement:
+**I am using the first example of grouping, where compartment and fungicide are in the same group_by() statement**
+
+```{r}
+microbiome.subset %>%
+  filter(Class == "Dothideomycetes") %>%
+  group_by(Compartment,Fungicide) %>%
+  mutate(Percent=Abundance*100) %>%
+  summarise(Mean=mean(Percent)) %>% 
+  
+  head()
+```
+
+## 5. Same as above, grouped by Orders in genus Dothideomycetes
+
+switch the group_by() statement to have Order:
+
+```{r}
+microbiome.subset %>%
+  group_by(Compartment,Fungicide,Order) %>%
+  mutate(Percent=Abundance*100) %>%
+  summarise(Mean=mean(Percent)) %>% 
+  
+  head()
+```
+
+Additionally, you could just have a group_by() statement with just Order in it:
+
+```{r}
+microbiome.subset %>%
+  group_by(Order) %>%
+  mutate(Percent=Abundance*100) %>%
+  summarise(Mean=mean(Percent)) %>% 
+  
+  head()
+```
+
+## 6. Calculate standard error for each mean in question 5
+
+Add in a calculation for standard deviation in the summarise function, and then use it in another muatation calculating a column for standard error. 
+
+**I used the second example where Order is by itself in the group_by() statement.**
+
+```{r}
+microbiome.subset %>%
+  group_by(Order) %>%
+  mutate(Percent=Abundance*100) %>%
+  summarise(Mean=mean(Percent),
+            n=n(),
+            stddev=sd(Percent)) %>%
+  mutate(stderr=stddev/sqrt(n)) %>%
+
+head()
+
+```
+
+## 7. Select columms, pivot data to wide so that compartment are column headers
+
+to make the data wide formatm use pivot_wider():
+**I used the names from Compartment, and the values from Mean, so that the mean values for each order were in separate columns titled "leaf" and "root".**
+
+```{r}
+microbiome.subset %>%
+  filter(Class=="Dothideomycetes") %>%
+  group_by(Order,Compartment,Fungicide) %>%
+  mutate(Percent=Abundance*100) %>%
+  summarise(Mean=mean(Percent),
+            n=n(),
+            stddev=sd(Percent)) %>%
+  mutate(stderr=stddev/sqrt(n)) %>%
+  pivot_wider(names_from=Compartment,values_from=Mean)
+```
+
+## 8. recreate the given plot from question 7 dataset
+
+I need to add the ggplot function and layers, and I also need to reorder the y axis.
+
+```{r}
+microbiome.subset %>%
+  filter(Class=="Dothideomycetes") %>%
+  group_by(Order,Compartment,Fungicide) %>%
+  mutate(Percent=Abundance*100) %>%
+  mutate(Order2=fct_reorder(Order,desc(Percent))) %>%
+  ggplot(aes(x=Percent,y=Order2,fill=Fungicide,color=Fungicide))+
+  stat_summary(fun=mean,geom="bar",position="dodge")+
+  ylab("Order")+
+  xlab("Percent relative abundance")
+  
+  
+
+```
+
+
+**For some reason, the fct_reorder() part of code will not work for me. the y axis doesn't change whether I put a - before Percent or not. but the graph otherwise looks fine.**
+ 
+
+
+
+
