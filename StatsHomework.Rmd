@@ -1,0 +1,237 @@
+---
+title: "Statistics Homework"
+author: "Nicole Baker"
+date: "2023-04-04"
+output: 
+  word_document: default
+  html_document: default
+  github_document: default
+editor_options: 
+  markdown: 
+    wrap: sentence
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Statistics Homework
+
+## Question 1: My Data
+
+##### The data that I currently have from my project revolves around collections made from traps this past field season. I have collected buprestid beetles in the genus *Chrysobothris* (and a handful of other related genera) and identified them to species.
+
+-   The genus *Chrysobothris* contains multiple pest species (ex. Flatheaded Appletree Borer) that commonly attack hardwoods like maple in nurseries and in the landscape.
+-   Damages caused by *Chrysobothris* can have a huge economic impact, however, the pests in this genus are relatively understudied with respect to distribution in Alabama, emergence windows and flight periods, and taxonomy.
+-   Characterizing the phenology of these beetles is key for well-informed control strategies. Additionally, developing more effective trapping methods can help improve beetle collection, as well as reduce pressure on the usual target hosts.
+
+#### Part 1: Basic trapping
+
+A set of ten prism panel traps were placed in three Locations across Alabama in February 2022 in order to collect information on basic *Chrysobothris* phenology: Hunter Trees in Alpine AL, Kreher Preserve in Auburn AL, and the Ornamental Horticulture Research Station in Mobile AL. I collected data on:
+
+-   Location of collection
+-   Date of collection
+-   Species collected
+-   Male:Female collections
+
+Based on preliminary work done with *Chrysobothris* in other states, we expected to see peak emergences from May to August.
+
+#### Part 2: Testing a new trap type
+
+In Mobile, a trial with PVC pole traps was installed towards the end of May, when standard traps began to collect an influx of *Chrysobothris*.
+6 different size diameters were set up in clusters of 6.
+I collected data on:
+
+-   Size of pole collected from
+-   Date collected
+-   Species collected
+-   Male:Female collections
+
+Because these beetles bore into the trunks of trees, we hypothesize that pole traps will perform better than standard panels.
+we also hypothesized that smaller caliper poles (1/2 inch - 1 inch) would collect more beetles, since young nursery trees are often prime targets of attack.
+
+#### Data assessment
+
+In order to understand trapping dynamics, we will be graphing emergence windows, characterizing the present species across Alabama, and comparing sex ratios.
+analysis between sex and collection date could also be useful, since females are the ones laying eggs.
+
+In order to determine if pole trap sizes have and effect on trapping, the number of individuals collected on each size will be conducted using an lm.
+In order to determine whether an effect of species and sex might also influence which size is most appealing, an ANOVA will be done with the six sizes against the number of individuals collected, species, and sex.
+
+Bar graphs will be useful for data visualization.
+
+## Question 2 & 3: Data Analysis and Discussion
+
+First, I will make sure I have my packages uploaded:
+
+```{r}
+library(tidyverse)
+library(lme4)
+library(emmeans)
+library(multcomp)
+```
+
+Now I will make sure my data file is loaded in appropriately.
+For this class I will be focusing on analyzing the data from part 2 of my experiment: pole size and *Chrysobothris* collections.
+
+```{r}
+GenTrap<-read.csv("GenTrap.csv",na.strings="na")
+GenTrap
+```
+
+First, I will make sure that pole size is a factor:
+
+```{r}
+GenTrap$Pole=as.factor(GenTrap$Pole)
+```
+
+Now I will log transform the data so that I can account for high numbers of zeros from my collections:
+
+```{r}
+GenTrap$LogTotal=log(GenTrap$Total+1)
+head(GenTrap)
+```
+
+#### Does Pole Trap Size Matter?
+
+now I can run an ANOVA on my data in order to see whether collections of *Chrysobothris* vary by pole trap size.
+
+```{r}
+results1<-lm(LogTotal~Pole,data=GenTrap)
+summary(results1)
+results2<-anova(results1)
+results2
+```
+
+based on my statistical analysis, *Chrysobothris* collections are not significantly influenced by pole trap size.
+Low overall collection totals likely influence this result.
+In order to visualize the data, I can plot it:
+
+```{r}
+plot1<- ggplot(GenTrap,aes(x=Pole,y=LogTotal,fill=Pole))+
+  stat_summary(fun=mean,geom="bar",position="dodge",color="black")+
+  stat_summary(fun.data=mean_se,geom="errorbar",position="dodge",width=0.5)+
+  theme_classic(base_size=10)+
+  labs(x="Pole Trap Size",
+       y=expression('Total'~italic(Chrysobothris)~ 'Collected'))
+plot1
+
+```
+
+In the above plot, the error bars show the wide variation in collections across the six pole sizes.
+
+Since the x axis is all out of order, here I am fixing it by using the scale_x\_discrete function:
+
+```{r}
+plot2<-ggplot(GenTrap,aes(x=Pole,y=LogTotal,fill=Pole))+
+  stat_summary(fun=mean,geom="bar",position="dodge",color="black")+
+  stat_summary(fun.data=mean_se,geom="errorbar",position="dodge",width=0.5)+
+  theme_classic(base_size=10)+
+  labs(x="Pole Trap Size",
+       y=expression('log(Total'~italic(Chrysobothris)~ 'Collected)'))+
+  scale_x_discrete(limits=c("1/2 Inch","3/4 Inch","1 Inch","1.5 Inch","2 Inch","3 Inch"))
+plot2
+  
+```
+
+#### Male vs Female Collections
+
+Now, I will go ahead and look at males vs females on pole traps, and whether this varies overall and by pole size:
+
+```{r}
+results2<-lm(LogTotal~Male+Female+Pole,data=GenTrap)
+summary(results2)
+results3<-anova(results2)
+results3
+```
+
+here, we can see that experiment-wide male and female collections were significantly different.
+This was expected, since Females are likely using specific visual cues for egg laying.
+Since pole traps are mimicking tree hosts, it makes sense that more females would be collected than males overall.
+Below I have plotted Male and Female collections:
+
+```{r}
+plot3<-GenTrap %>%
+  filter(!is.na(Male)) %>%
+  filter(!is.na(Female)) %>%
+  ggplot(aes(x=Male & Female,y=LogTotal,fill=Pole))+ stat_summary(fun=mean,geom="bar",position="dodge",color="black")+
+  stat_summary(fun.data=mean_se,geom="errorbar",position="dodge")+
+  theme_classic(base_size=10)+
+  labs(x="Sex",
+       y=expression('log(Total'~italic(Chrysobothris)~ 'Collected)'))+
+  scale_x_discrete(labels=c("Male","Female"))
+plot3
+
+```
+
+#### Species in Mobile
+
+Finally, I will make a visual depicting totals of various species in Alabama.
+
+First I need to load in the data file with species information:
+
+```{r}
+Species<-read.csv("MobileSpecies.csv")
+Species
+```
+
+In order to visualize species totals in Mobile, I will make a plot:
+
+```{r}
+plot4<-ggplot(Species,aes(x=Species,y=Total,fill=Sex))+
+  geom_bar(stat="identity",color="black")+
+  theme_classic(base_size=7)+
+  labs(x="Species",
+       y=expression('Total'~italic(Chrysobothris)~ 'Collected'))
+plot4
+
+```
+
+here you can see the distribution of individuals collected in Mobile in 2022.
+We can see clearly that the species collected most frequently was *Chrysobothris shawnee*.
+Of all the species collected across Alabama, the only one not found in Mobile was *Chrysobothris azurea*.
+
+It is surprising that more individuals of *Chrysobothris femorata* were not found, however, this species is extremely similar to *C. shawnee*.
+*C. shawnee* and *C. femorata* are considered the same species by some resources, however, others categorize them as separate species.
+Based on taxonomic resources I used from the official Flatheaded Borer project group, I considered them to be 2 separate species.
+
+Additionally, identification of these beetles can be extremely challenging without male genitalia.
+Since the vast majority of *C. shawnee* individuals I collected were female, it is possible that the more obscure female characteristics between *C. shawnee* and *C. femorata* prevented 100% accurate species identification of my collections.
+
+In order to more accurately determine the identities of these beetles, genetic analysis would be useful.
+Since comprehensive, accurate genetic records of *Chrysobothris* species are not currently available, collaborators on the Flatheaded Borer research project are currently working on characterizing the genomes of collected *Chrysobothris* species across the southeast.
+
+#### *C.shawnee* Phenology
+
+Since *C. shawnee* is the only species I collected a large number of throughout the trapping season, I will use this information to graphically depict basic phelology by grouping collections by month.
+I need to use a new data file:
+
+```{r}
+ShawneeData<-read.csv("ShawneeMobile.csv")
+ShawneeData
+```
+
+Now I can make a graph:
+
+```{r}
+plot5<-ggplot(ShawneeData,aes(x=Month,y=Total,fill=Sex))+
+  geom_point(stat="identity",shape=21,color="black")
+plot5
+```
+
+This shows the number of collected specimens by month, but I am not sure how to connect the data points or make it depict information over time more clearly.
+This can give some insight to emergence and flight periods of this individual species, however, conclusions are limited due to our collections only being made every couple of weeks - once a month on traps, which give no host information and no clear emergence dates. 
+
+
+#### Overall Conclusion
+Overall, my data set consists of exploratory species collections from spring/summer 2022 in order to more clearly understand the presence of *Chrysobothris* species across Alabama. Since these beetles are common, problematic pests of many ornamental, fruit, and nut crops in the southeastern US, understanding the distribution and phenology of them is key for more comprehensive and successful management. 
+
+Due to low overall collections, This year in 2023 I will be utilizing alternative sites to maximize trapping. Additionally, I will be transitioning to using all pole style traps, since they more directly mimic potential hosts. 
+Finally, a set of red maples will be used as sacrificial hosts alongside trapping in Mobile. By replacing a tree alongside my traps every two weeks, we can later harvest the wood and rear out any potential borers the following spring. Gaining information that connects these beetles directly to a host is key for understanding their environmental dynamics. 
+
+
+
+
+
+
+
