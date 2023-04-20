@@ -1,6 +1,6 @@
 # Reproducibility Project: The *Chrysobothris femorata* Complex in Alabama: Species, Flight Period, and Factors Affecting Host Choice
 
-### The main purpose of this class was to create a reproducible workflow of my Master's research project. My project, as well as the contents of this repository, are described below.
+### The main purpose of this class was to create a reproducible workflow of my Master's research project. All project work is described below.
 
 Beetles in the genus *Chrysobothris* are common ornamental tree, fruit, and nut pests across the southeastern US. 
 Unlike other pest borers, like the Emerald Ash Borer, individuals beloning to the genus *Chrysobothris* are poorly understood with respect to phenology and distribution. 
