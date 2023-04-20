@@ -17,8 +17,12 @@ Additionally, these borers remain taxonomically unresolved, and identification t
 **Due to extremely low collections from Auburn and Alpine, the data presented and analyzed here in this repository pertains only to Mobile.**
 
 All data files, R scripts, and files associated with the reproducibility class can be found here:
+
 [scripts](https://github.com/njbaker61/Reproducibility-Class/tree/main/Scripts)
+
 [Analysis](https://github.com/njbaker61/Reproducibility-Class/tree/main/Analysis)
+
 [Class Work](https://github.com/njbaker61/Reproducibility-Class/tree/main/class%20work/R_practice)
+
 
 For more information on the multi-state collaborations being done with Chrysobothris species across the US, [check out the collaborative project webpage.](https://www.stopfhb.com)
